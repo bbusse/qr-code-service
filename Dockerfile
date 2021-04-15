@@ -47,18 +47,8 @@ RUN addgroup -S $USER && adduser -S $USER -G $USER -G abuild \
     && deluser --remove-home smmsp \
     && deluser --remove-home guest \
 
-    # Get geckodriver
-    && wget https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz \
-    && tar -xzf geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz -C /usr/bin \
-    && rm geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz \
-    && geckodriver --version \
-
-    # Add latest webdriver-util script for firefox automation
-    && wget -P /usr/local/bin https://raw.githubusercontent.com/bbusse/webdriver-util/main/webdriver_util.py \
-    && chmod +x /usr/local/bin/webdriver_util.py \
-
     # Run app
-    && echo "exec qr_service.py --debug=$DEBUG" >> /etc/sway/config.d/firefox
+    && echo "exec qr_service --debug=$DEBUG" >> /etc/sway/config.d/firefox
 
 # Add entrypoint
 USER $USER
