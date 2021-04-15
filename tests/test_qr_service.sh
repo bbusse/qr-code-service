@@ -9,7 +9,7 @@ run_service() {
     cd ../ || exit
     ./qr_service > /dev/null 2>&1 &
     PID=$!
-    sleep 5
+    sleep 2
 }
 
 test_qr_service_running() {
@@ -19,7 +19,7 @@ test_qr_service_running() {
 test_qr_encode() {
     if ! command -v md5 &> /dev/null
     then
-        cmd="md5sum"
+        cmd="md5sum  | awk '{ print $1 }'"
     else
         cmd="md5"
     fi
