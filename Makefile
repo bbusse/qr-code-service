@@ -17,4 +17,4 @@ test:
 	./bash_unit tests/test_qr_service.sh
 
 clean:
-	rm -rf static/*png
+	rm -f static/*png
