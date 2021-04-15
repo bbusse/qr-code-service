@@ -1,11 +1,11 @@
 # qr-code-service
 An http service for QR code generation  
-  
-![QR-Code](qr-code.png "QR code")  
-  
 [![GitHub Super-Linter](https://github.com/bbusse/qr-code-service/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
 &nbsp;![Docker Build](https://github.com/bbusse/qr-code-service/actions/workflows/docker-image.yml/badge.svg)  
 &nbsp;![Tests](https://github.com/bbusse/qr-code-service/actions/workflows/make-test.yml/badge.svg)
+  
+![QR-Code](qr-code.png "QR code")  
+  
 ## Endpoints
 - /encode  Generate and return qr-code png
 - /delete  Delete all files
@@ -33,7 +33,8 @@ optional arguments:
 ```
 ### Run container
 ```bash
-$ podman run 
+$ podman run
+[output]
 ```
 ### Create QR-Code
 A GET request to the **/encode** endpoint with optional **url**, **size** and **margin** parameters to encode the given URL immediately returns a png encoded image file
@@ -74,6 +75,17 @@ $ export LISTEN_ADDRESS=localhost; \
 ### Run tests
 ```bash
 $ make test
+./tests/install_bash_unit.sh
+bash_unit test framework exists
+./bash_unit
+./bash_unit tests/test_qr_service.sh
+Running tests in tests/test_qr_service.sh
+Starting qr-service
+Running test_qr_delete... SUCCESS ✓
+Running test_qr_encode... SUCCESS ✓
+Running test_qr_list... SUCCESS ✓
+Running test_qr_service_running... SUCCESS ✓
+Stopping qr-service (55036)
 ```
 
 ## References
