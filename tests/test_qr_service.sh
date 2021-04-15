@@ -17,16 +17,17 @@ test_qr_service_running() {
 }
 
 test_qr_encode() {
+    local testfile="qr-code-test.png"
+
     if ! command -v md5 &> /dev/null
     then
         cmd="md5sum"
-        md5_expected="4f854cd7f43689b5ac552528a402d2b0"
+        md5_expected="4f854cd7f43689b5ac552528a402d2b0 ${testfile}"
     else
         cmd="md5 -q"
         md5_expected="d66a1f47df6043dcf9850613521f9507"
     fi
 
-    testfile="qr-code-test.png"
     [ -e testfile ] && rm testfile
     curl -s -o ${testfile} "http://localhost:44123/encode?url=http://github.com/bbusse/qr-service&size=15&margin=2"
     md5sum=$($cmd ${testfile})
