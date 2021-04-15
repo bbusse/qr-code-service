@@ -1,0 +1,179 @@
+#!/usr/bin/env python3
+
+'''
+An http service for generating qr-codes
+
+© 2021 Björn Busse (see also: LICENSE)
+bj.rn@baerlin.eu
+'''
+
+import logging
+import os
+from subprocess import Popen,PIPE
+import hashlib
+from flask import abort, Flask, request, jsonify
+from prometheus_flask_exporter import PrometheusMetrics
+import configargparse
+
+app = Flask(__name__)
+
+@app.route("/")
+def info():
+    ''' Returns the service name '''
+    return "qr-service"
+
+# Readiness
+@app.route('/healthy')
+def healthy():
+    ''' Basic health check '''
+    return "OK"
+
+# Liveness
+@app.route('/healthz')
+def healthz():
+    ''' Basic liveness check '''
+    return probe_liveness()
+
+# QR Code
+@app.route('/encode')
+def encode():
+    '''
+    Sends a png file with the qr-code of the given text
+    :param url: The URL to encode
+    :type url: str
+    :param size: The size
+    :type size: str
+    :param margin: The size
+    :type margin: str
+    '''
+    url = request.args.get('url')
+    size = request.args.get('size')
+    margin = request.args.get('margin')
+    if not size:
+        size = "15"
+    if not margin:
+        margin = "2"
+
+    fileid = hashlib.md5(url.encode(encoding='UTF-8')).hexdigest()
+    filename = str(fileid) + '.png'
+    path = 'static/' + filename
+    process = Popen(['qrencode',
+                     '-m',
+                     margin,
+                     '--size',
+                     size,
+                     '-o',
+                     path,
+                     url],
+                     stdout=PIPE,
+                     stderr=PIPE,
+                     start_new_session=True,
+                     close_fds=False)
+
+    output, error = process.communicate()
+    output = output.splitlines()
+    error = error.splitlines()
+    for line in output:
+        logging.info(line)
+    for line in error:
+        logging.info(line)
+
+    fstat = os.stat(path)
+    if fstat.st_size > 0:
+        return send_file(filename)
+
+    abort(404, description="Resource not found")
+    return False
+
+@app.route("/files")
+def list_files(path="static/"):
+    ''' Endpoint to list files on the server. '''
+    if disable_list:
+        abort(404, description="File view is disabled")
+
+    files = []
+    for filename in os.listdir(path):
+        path = os.path.join(path, filename)
+        if os.path.isfile(path):
+            files.append(filename)
+    return jsonify(files)
+
+@app.route('/delete')
+def delete():
+    '''
+    Removes all files with png suffix in the static folder
+    '''
+    if disable_delete:
+        abort(404, "Delete is disabled")
+
+    remove_files("static/", ".png")
+    return "OK"
+
+def remove_files(path, suffix):
+    '''
+    Removes files with given suffix in given path
+    '''
+    folder=os.listdir(path)
+
+    for item in folder:
+        if item.endswith(suffix):
+            os.remove(path + item)
+
+def probe_liveness():
+    ''' Check health '''
+    return "OK"
+
+def send_file(filename):
+    ''' Send file to client '''
+    return app.send_static_file(filename)
+
+
+if __name__ == "__main__":
+
+    parser = configargparse.ArgParser( description="")
+    parser.add_argument('--listen-address',
+                         dest='listen_address',
+                         help="The address to listen on",
+                         type=str,
+                         default="0.0.0.0")
+
+    parser.add_argument('--listen-port',
+                         dest='listen_port',
+                         help="The port to listen on",
+                         type=str,
+                         default="44123")
+
+    parser.add_argument('--disable-delete-files',
+                         dest='disable_delete',
+                         help="Disable file deletion",
+                         action='store_true')
+
+    parser.add_argument('--disable-list-files',
+                         dest='disable_list',
+                         help="Disable file listing",
+                         action='store_true')
+
+    parser.add_argument('--debug',
+                         dest='debug',
+                         help="Show debug output",
+                         action='store_true')
+
+    args = parser.parse_args()
+
+    listen_address = args.listen_address
+    listen_port = args.listen_port
+    disable_delete = args.disable_delete
+    disable_list = args.disable_list
+    debug = args.debug
+
+    if debug:
+        env = os.environ.copy()
+        for k, v in env.items():
+            print(k + '=' + v)
+
+    # Enable metrics
+    metrics = PrometheusMetrics.for_app_factory()
+    metrics.init_app(app)
+
+    # Start webserver
+    app.run(host=listen_address, port=listen_port)
