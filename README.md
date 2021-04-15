@@ -4,11 +4,13 @@ An http service for QR-Code generator
   
 ![QR-Code](qr-code.png "QR Code")
 ## Endpoints
-- /encode Generate and return qr-code png
-- /delete Delete all files
-- /files  List available files
+- /encode  Generate and return qr-code png
+- /delete  Delete all files
+- /files   List available files
+- /metrics Prometheus metrics endpoint
 
 ## Usage
+### Run service
 ```
 $ ./qr_service --help
 usage: qr_service [-h] [--listen-address LISTEN_ADDRESS]
@@ -26,6 +28,10 @@ optional arguments:
   --disable-list-files  Disable file listing
   --debug               Show debug output
 ```
+### Run container
+```
+$ podman run 
+```
 ### Create QR-Code
 A GET request to the **/encode** endpoint with optional **url**, **size** and **margin** parameters to encode the given URL immediately returns a png encoded image file
 ```
@@ -39,7 +45,14 @@ Generated files land in the static/ directory and can also be fetched from there
 The directory does not get emptied automatically.  
 A request to **/delete** removes all png files in this location, if enabled
 
-### Clean-up
+### List generated files on server
+A call to the **/files** endpoint returns JSON containing all present png files at the static location
+```
+$ export LISTEN_ADDRESS=localhost; \
+  export LISTEN_PORT=44123; \
+  curl http://${LISTEN_ADDRESS}:${LISTEN_PORT}/files
+```
+### Clean-up files on server
 A call to the **/delete** endpoint deletes all present png files at the static location
 ```
 $ export LISTEN_ADDRESS=localhost; \
@@ -47,7 +60,7 @@ $ export LISTEN_ADDRESS=localhost; \
   curl http://${LISTEN_ADDRESS}:${LISTEN_PORT}/delete
 ```
 
-## Metrics
+### Metrics
 A **/metrics** endpoint for Prometheus exists
 ```
 $ export LISTEN_ADDRESS=localhost; \
@@ -55,6 +68,10 @@ $ export LISTEN_ADDRESS=localhost; \
   curl http://${LISTEN_ADDRESS}:${LISTEN_PORT}/metrics
 ```
 
+### Run tests
+```
+$ make test
+```
 
 ## References
 [libqrencode](https://github.com/fukuchi/libqrencode)
