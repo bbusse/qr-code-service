@@ -99,9 +99,10 @@ def list_files(path="static/"):
 
     files = []
     for filename in os.listdir(path):
-        fpath = os.path.join(path, filename)
-        if os.path.isfile(fpath):
-            files.append(filename)
+        if filename != "index.html":
+            fpath = os.path.join(path, filename)
+            if os.path.isfile(fpath):
+                files.append(filename)
 
     return jsonify(files)
 
