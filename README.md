@@ -9,10 +9,10 @@ An http service for QR-Code generation
 
 ## Usage
 ```
-$ ./qr_service.py --help
-usage: qr_service.py [-h] [--listen-address LISTEN_ADDRESS]
-                     [--listen-port LISTEN_PORT] [--disable-delete-files]
-                     [--disable-list-files] [--debug]
+$ ./qr_service --help
+usage: qr_service [-h] [--listen-address LISTEN_ADDRESS]
+                  [--listen-port LISTEN_PORT] [--disable-delete-files]
+                  [--disable-list-files] [--debug]
 
 optional arguments:
   -h, --help            show this help message and exit
