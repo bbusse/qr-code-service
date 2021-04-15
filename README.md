@@ -12,8 +12,8 @@ A k8s ready http service for QR code generation
 - /delete  Delete all files
 - /files   List available files
 - /metrics Prometheus metrics endpoint
-- /healthy
-- /healthz 
+- /healthy Health check: Readiness
+- /healthz Health check: Liveness
 
 ## Usage
 ### Run service
