@@ -74,4 +74,5 @@ $ make test
 ```
 
 ## References
+[Wikipedia: QR-Code](https://en.wikipedia.org/wiki/QR_code)  
 [libqrencode](https://github.com/fukuchi/libqrencode)
