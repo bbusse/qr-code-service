@@ -55,8 +55,14 @@ def encode():
         margin = "2"
 
     fileid = hashlib.md5(url.encode(encoding='UTF-8')).hexdigest()
-    filename = str(fileid) + '.png'
+    filename = str(fileid) + '_' + size + '_' + margin + '.png'
     path = 'static/' + filename
+
+    if os.path.isfile(path):
+        fstat = os.stat(path)
+        if fstat.st_size > 0:
+            return send_file(filename)
+
     process = Popen(['qrencode',
                      '-m',
                      margin,
