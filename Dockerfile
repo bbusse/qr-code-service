@@ -51,6 +51,6 @@ RUN addgroup -S $USER && adduser -S $USER -G $USER \
 USER $USER
 COPY qr_service /usr/local/bin
 COPY requirements.txt /
-RUN pip3 install --user -r requirements.txt
+RUN pip3 install --no-cache-dir --user -r requirements.txt
 COPY entrypoint.sh /
 ENTRYPOINT ["/entrypoint.sh"]
