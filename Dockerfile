@@ -62,7 +62,7 @@ RUN addgroup -S $USER && adduser -S $USER -G $USER -G abuild \
 
 # Add entrypoint
 USER $USER
-COPY controller.py /usr/local/bin
+COPY qr_service /usr/local/bin
 COPY requirements.txt /
 RUN pip3 install --user -r requirements.txt
 COPY entrypoint.sh /

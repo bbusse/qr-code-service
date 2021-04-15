@@ -6,7 +6,7 @@ case "$1" in
         set -- "$@"
     ;;
     *)
-        set -- controller.py
+        set -- qr_service
     ;;
 esac
 
