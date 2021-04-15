@@ -46,8 +46,8 @@ jobs:
         platforms: linux/amd64
         push: true
         tags: |
-          ghcr.io/bbusse/qr-service:${{ env.VERSION }}
-          ghcr.io/bbusse/qr-service:latest
+          ghcr.io/bbusse/qr-code-service:${{ env.VERSION }}
+          ghcr.io/bbusse/qr-code-service:latest
 
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
