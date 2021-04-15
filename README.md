@@ -1,4 +1,4 @@
-# qr-service
+# qr-code-service
 An http service for QR code generation  
   
 ![QR-Code](qr-code.png "QR code")  
