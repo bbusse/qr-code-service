@@ -28,7 +28,7 @@ test_qr_encode() {
 
     testfile="qr-code-test.png"
     [ -e testfile ] && rm testfile
-    $(curl -s -o ${testfile} "http://localhost:44123/encode?url=http://github.com/bbusse/qr-service&size=15&margin=2")
+    curl -s -o ${testfile} "http://localhost:44123/encode?url=http://github.com/bbusse/qr-service&size=15&margin=2"
     md5sum=$($cmd ${testfile})
     [ -e testfile ] && rm testfile
     assert_equals "$md5_expected" "$md5sum" "qr: Receiving qr-code file failed"
