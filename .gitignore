@@ -1,3 +1,4 @@
+bash_unit
 static/*
 !static/index.html
 VERSION
