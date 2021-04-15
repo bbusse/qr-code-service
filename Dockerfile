@@ -45,7 +45,7 @@ RUN addgroup -S $USER && adduser -S $USER -G $USER -G abuild \
     && deluser --remove-home vpopmail \
     && deluser --remove-home ntp \
     && deluser --remove-home smmsp \
-    && deluser --remove-home guest \
+    && deluser --remove-home guest
 
 # Add entrypoint
 USER $USER
