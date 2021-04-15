@@ -1,7 +1,7 @@
 ARG ALPINE_VERSION=3.13.5
 FROM alpine:${ALPINE_VERSION}
 LABEL maintainer="Björn Busse <bj.rn@baerlin.eu>"
-LABEL org.opencontainers.image.source https://github.com/bbusse/qr-code-service
+LABEL org.opencontainers.image.source=https://github.com/bbusse/qr-code-service
 
 ENV ARCH="x86_64" \
     USER="qr" \
