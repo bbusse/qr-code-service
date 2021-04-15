@@ -1,7 +1,7 @@
 # qr-code-service
 An http service for QR code generation  
 [![GitHub Super-Linter](https://github.com/bbusse/qr-code-service/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
-&nbsp;![Docker Build](https://github.com/bbusse/qr-code-service/actions/workflows/docker-image.yml/badge.svg)  
+&nbsp;![Docker Build](https://github.com/bbusse/qr-code-service/actions/workflows/docker-image.yml/badge.svg)
 &nbsp;![Tests](https://github.com/bbusse/qr-code-service/actions/workflows/make-test.yml/badge.svg)
   
 ![QR-Code](qr-code.png "QR code")  
