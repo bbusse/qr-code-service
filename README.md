@@ -1,8 +1,8 @@
-[![GitHub Super-Linter](https://github.com/bbusse/qr-service/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
 # qr-service
-An http service for QR-Code generation  
+An http service for QR code generation  
   
-![QR-Code](qr-code.png "QR Code")
+[![GitHub Super-Linter](https://github.com/bbusse/qr-service/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
+![QR-Code](qr-code.png "QR code")
 ## Endpoints
 - /encode  Generate and return qr-code png
 - /delete  Delete all files
@@ -11,7 +11,7 @@ An http service for QR-Code generation
 
 ## Usage
 ### Run service
-```
+```bash
 $ ./qr_service --help
 usage: qr_service [-h] [--listen-address LISTEN_ADDRESS]
                   [--listen-port LISTEN_PORT] [--disable-delete-files]
@@ -29,12 +29,12 @@ optional arguments:
   --debug               Show debug output
 ```
 ### Run container
-```
+```bash
 $ podman run 
 ```
 ### Create QR-Code
 A GET request to the **/encode** endpoint with optional **url**, **size** and **margin** parameters to encode the given URL immediately returns a png encoded image file
-```
+```bash
 $ export LISTEN_ADDRESS=localhost; \
   export LISTEN_PORT=44123; \
   export URL=https://[::1]; \
@@ -47,14 +47,14 @@ A request to **/delete** removes all png files in this location, if enabled
 
 ### List generated files on server
 A call to the **/files** endpoint returns JSON containing all present png files at the static location
-```
+```bash
 $ export LISTEN_ADDRESS=localhost; \
   export LISTEN_PORT=44123; \
   curl http://${LISTEN_ADDRESS}:${LISTEN_PORT}/files
 ```
 ### Clean-up files on server
 A call to the **/delete** endpoint deletes all present png files at the static location
-```
+```bash
 $ export LISTEN_ADDRESS=localhost; \
   export LISTEN_PORT=44123; \
   curl http://${LISTEN_ADDRESS}:${LISTEN_PORT}/delete
@@ -62,14 +62,14 @@ $ export LISTEN_ADDRESS=localhost; \
 
 ### Metrics
 A **/metrics** endpoint for Prometheus exists
-```
+```bash
 $ export LISTEN_ADDRESS=localhost; \
   export LISTEN_PORT=44123; \
   curl http://${LISTEN_ADDRESS}:${LISTEN_PORT}/metrics
 ```
 
 ### Run tests
-```
+```bash
 $ make test
 ```
 
