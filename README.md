@@ -1,6 +1,6 @@
 [![GitHub Super-Linter](https://github.com/bbusse/qr-service/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
 # qr-service
-An http service for QR-Code generator  
+An http service for QR-Code generation  
   
 ![QR-Code](qr-code.png "QR Code")
 ## Endpoints
