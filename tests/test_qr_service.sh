@@ -20,7 +20,7 @@ test_qr_encode() {
     if ! command -v md5 &> /dev/null
     then
         cmd="md5sum"
-        md5_expected="4f854cd7f43689b5ac552528a402d2b0  -"
+        md5_expected="4f854cd7f43689b5ac552528a402d2b0"
     else
         cmd="md5 -q"
         md5_expected="d66a1f47df6043dcf9850613521f9507"
