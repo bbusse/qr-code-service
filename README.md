@@ -3,7 +3,8 @@ An http service for QR code generation
   
 ![QR-Code](qr-code.png "QR code")  
   
-[![GitHub Super-Linter](https://github.com/bbusse/qr-service/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
+[![GitHub Super-Linter](https://github.com/bbusse/qr-code-service/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
+&nbsp;![Tests](https://github.com/bbusse/qr-code-service/actions/workflows/make-test.yml/badge.svg)
 ## Endpoints
 - /encode  Generate and return qr-code png
 - /delete  Delete all files
