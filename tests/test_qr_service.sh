@@ -23,11 +23,14 @@ test_qr_encode() {
         md5_expected="4f854cd7f43689b5ac552528a402d2b0  -"
     else
         cmd="md5"
-        md5_expected="824dd62f5c5e2b1da68b1853712bb9e5"
+        md5_expected="d66a1f47df6043dcf9850613521f9507"
     fi
 
-    png=$(curl -s "http://localhost:44123/encode?url=http://github.com/bbusse/qr-service&size=15&margin=2")
-    md5sum=$(echo "$png" | $cmd)
+    testfile="qr-code-test.png"
+    [ -e testfile ] && rm testfile
+    png=$(curl -s -o ${testfile} "http://localhost:44123/encode?url=http://github.com/bbusse/qr-service&size=15&margin=2")
+    md5sum=$(cat ${testfile} | $cmd)
+    [ -e testfile ] && rm testfile
     assert_equals "$md5_expected" "$md5sum" "qr: Receiving qr-code file failed"
 }
 
