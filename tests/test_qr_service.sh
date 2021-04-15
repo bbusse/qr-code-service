@@ -23,7 +23,7 @@ test_qr_encode() {
 }
 
 test_qr_list() {
-    $(touch static/0a52ee86bcd81feccf8641735563ac3f_15_2.png)
+    touch static/0a52ee86bcd81feccf8641735563ac3f_15_2.png
     r=$(curl -s http://localhost:44123/files)
     assert_equals "[\"0a52ee86bcd81feccf8641735563ac3f_15_2.png\"]" "$r" "qr: File listing failed"
 }
