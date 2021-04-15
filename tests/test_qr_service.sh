@@ -19,14 +19,16 @@ test_qr_service_running() {
 test_qr_encode() {
     if ! command -v md5 &> /dev/null
     then
-        cmd="md5sum  | awk '{ print $1 }'"
+        cmd="md5sum"
+        md5_expected="bla"
     else
         cmd="md5"
+        md5_expected="824dd62f5c5e2b1da68b1853712bb9e5"
     fi
 
     png=$(curl -s "http://localhost:44123/encode?url=http://github.com/bbusse/qr-service&size=15&margin=2")
     md5sum=$(echo "$png" | $cmd)
-    assert_equals "824dd62f5c5e2b1da68b1853712bb9e5" "$md5sum" "qr: Receiving qr-code file failed"
+    assert_equals "$md5_expected" "$md5sum" "qr: Receiving qr-code file failed"
 }
 
 test_qr_list() {
