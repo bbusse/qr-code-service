@@ -47,9 +47,6 @@ RUN addgroup -S $USER && adduser -S $USER -G $USER -G abuild \
     && deluser --remove-home smmsp \
     && deluser --remove-home guest \
 
-    # Run app
-    && echo "exec qr_service --debug=$DEBUG" >> /etc/sway/config.d/firefox
-
 # Add entrypoint
 USER $USER
 COPY qr_service /usr/local/bin
