@@ -5,7 +5,7 @@ LABEL org.opencontainers.image.source=https://github.com/bbusse/qr-code-service
 
 ENV ARCH="x86_64" \
     USER="qr" \
-    APK_ADD="python3 py3-pip libqrencode" \
+    APK_ADD="python3~=3 py3-pip~=20 libqrencode~=4" \
     APK_DEL=""
 
 # Add packages
