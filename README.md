@@ -4,7 +4,7 @@ An http service for QR-Code generation
 ## Endpoints
 - /encode Generate and return qr-code png
 - /delete Delete all files
-- /files  List available file
+- /files  List available files
 
 ## Usage
 ```
