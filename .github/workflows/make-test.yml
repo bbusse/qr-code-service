@@ -10,6 +10,8 @@ jobs:
       matrix:
         python-version: [3.8]
     steps:
+    - name: Install libqrencode
+      run: sudo apt install qrencode
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
