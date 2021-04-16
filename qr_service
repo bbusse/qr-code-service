@@ -61,6 +61,7 @@ def encode():
     if os.path.isfile(path):
         fstat = os.stat(path)
         if fstat.st_size > 0:
+            app.logger.info(' Serving existing file')
             return send_file(filename)
 
     process = Popen(['qrencode',
@@ -137,6 +138,8 @@ def send_file(filename):
 
 
 if __name__ == "__main__":
+
+    logging.basicConfig(level=logging.DEBUG)
 
     parser = configargparse.ArgParser( description="")
     parser.add_argument('--listen-address',
