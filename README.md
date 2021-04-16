@@ -1,9 +1,9 @@
 # qr-code-service
-A k8s ready http service for QR code generation  
-  
 [![GitHub Super-Linter](https://github.com/bbusse/qr-code-service/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
 &nbsp;![Docker Build](https://github.com/bbusse/qr-code-service/actions/workflows/docker-image.yml/badge.svg)
 &nbsp;![Tests](https://github.com/bbusse/qr-code-service/actions/workflows/make-test.yml/badge.svg)
+  
+A k8s ready http service for QR code generation  
   
 ![QR-Code](qr-code.png "QR code")  
   
@@ -82,14 +82,16 @@ $ make test
 ./tests/install_bash_unit.sh
 bash_unit test framework exists
 ./bash_unit
-./bash_unit tests/test_qr_service.sh
-Running tests in tests/test_qr_service.sh
-Starting qr-service
+./bash_unit tests/test_qr_code_service.sh
+Running tests in tests/test_qr_code_service.sh
+Starting qr-code-service
 Running test_qr_delete... SUCCESS ✓
 Running test_qr_encode... SUCCESS ✓
+Running test_qr_healthy... SUCCESS ✓
+Running test_qr_healthz... SUCCESS ✓
 Running test_qr_list... SUCCESS ✓
 Running test_qr_service_running... SUCCESS ✓
-Stopping qr-service (55036)
+Stopping qr-code-service (84054)
 ```
 
 ## References
