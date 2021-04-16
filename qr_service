@@ -11,6 +11,7 @@ import logging
 import os
 from subprocess import Popen,PIPE
 import hashlib
+import pathlib
 from flask import abort, Flask, request, jsonify
 from prometheus_flask_exporter import PrometheusMetrics
 import configargparse
@@ -130,7 +131,40 @@ def remove_files(path, suffix):
 
 def probe_liveness():
     ''' Check health '''
-    return "OK"
+    # Remove test file
+    testfile = "qr-code-test.png"
+    if os.path.isfile(testfile):
+        os.remove(testfile)
+
+    url = "http://localhost:44123/encode?url=http://github.com/bbusse/qr-service&size=15&margin=2"
+    process = Popen(['curl',
+                     '-s',
+                     '-o',
+                     'qr-code-test.png',
+                     url],
+                     stdout=PIPE,
+                     stderr=PIPE,
+                     start_new_session=True,
+                     close_fds=False)
+
+    output, error = process.communicate()
+    output = output.splitlines()
+    error = error.splitlines()
+    for line in output:
+        logging.info(line)
+    for line in error:
+        logging.info(line)
+
+    cksum = hashlib.md5(pathlib.Path(testfile).read_bytes()).hexdigest()
+
+    # Remove test file
+    if os.path.isfile(testfile):
+        os.remove(testfile)
+
+    if cksum == "d66a1f47df6043dcf9850613521f9507":
+        return "OK"
+    else:
+        return "ERROR"
 
 def send_file(filename):
     ''' Send file to client '''
