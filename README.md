@@ -76,7 +76,7 @@ $ export LISTEN_ADDRESS=localhost; \
 ```
 
 ### Run tests
-[bash_unit](https://github.com/pgrange/bash_unit) is used to run the test
+[bash_unit](https://github.com/pgrange/bash_unit) is used to run the tests
 ```bash
 $ make test
 ./tests/install_bash_unit.sh
