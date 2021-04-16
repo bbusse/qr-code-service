@@ -5,7 +5,7 @@ setup_suite() {
 }
 
 run_service() {
-    printf "Starting qr-service\n"
+    printf "Starting qr-code-service\n"
     cd ../ || exit
     ./qr_service > /dev/null 2>&1 &
     PID=$!
@@ -31,8 +31,10 @@ test_qr_encode() {
     [ -e testfile ] && rm testfile
     curl -s -o ${testfile} "http://localhost:44123/encode?url=http://github.com/bbusse/qr-service&size=15&margin=2"
     md5sum=$($cmd ${testfile})
+    mimetype=$(file -i ${testfile})
     [ -e testfile ] && rm testfile
     assert_equals "$md5_expected" "$md5sum" "qr: Receiving qr-code file failed"
+    assert_equals "${testfile}: image/png; charset=binary" "$mimetype" "qr: ${testfile} is not a png image"
 }
 
 test_qr_list() {
@@ -46,8 +48,18 @@ test_qr_delete() {
     assert_equals "OK" "$r" "qr: File deletion failed"
 }
 
+test_qr_healthy() {
+    r=$(curl -s http://localhost:44123/healthy)
+    assert_equals "OK" "$r" "qr: health check for readiness failed"
+}
+
+test_qr_healthz() {
+    r=$(curl -s http://localhost:44123/healthz)
+    assert_equals "OK" "$r" "qr: health check for liveness failed"
+}
+
 teardown_suite() {
-    printf "Stopping qr-service (%s)\n" "$PID"
+    printf "Stopping qr-code-service (%s)\n" "$PID"
     if ! kill $PID > /dev/null 2>&1; then
         printf "Failed to send SIGTERM to %s\n" "$PID"
     fi
