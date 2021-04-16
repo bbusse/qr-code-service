@@ -14,7 +14,7 @@ install: qr_service
 test:
 	./tests/install_bash_unit.sh
 	./bash_unit
-	./bash_unit tests/test_qr_service.sh
+	./bash_unit tests/test_qr_code_service.sh
 
 clean:
 	rm -f static/*png
