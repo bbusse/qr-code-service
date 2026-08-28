@@ -23,9 +23,9 @@ jobs:
     uses: bbusse/github-workflows/.github/workflows/run-tests-bash-unit.yml@dev
     with:
       test_files: tests/test_qr_code_service.sh
-      # The encoder shells out to qrencode; the suite probes the running
-      # service with nc and checks the returned file's mimetype with file(1).
-      apt_packages: qrencode netcat-openbsd file
+      # The suite probes the running service with nc; the encoded png is checked
+      # by its signature bytes, and encoding itself is pure python.
+      apt_packages: netcat-openbsd
       pip_install: .[service]
       # This suite cd's relative to its own location to start ./qr_service and
       # to write into static/, so bash_unit has to enter tests/ itself.
