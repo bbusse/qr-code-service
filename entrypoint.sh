@@ -2,11 +2,11 @@
 set -o errexit
 
 case "$1" in
-    sh|bash)
-        set -- "$@"
+sh | bash)
+    set -- "$@"
     ;;
-    *)
-        set -- qr_service
+*)
+    set -- qr_service
     ;;
 esac
 

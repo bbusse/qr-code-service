@@ -7,7 +7,7 @@ setup_suite() {
 run_service() {
     printf "Starting qr-code-service\n"
     cd ../ || exit
-    ./qr_service > /dev/null 2>&1 &
+    ./qr_service >/dev/null 2>&1 &
     PID=$!
     sleep 2
 }
@@ -19,8 +19,7 @@ test_qr_service_running() {
 test_qr_encode() {
     local testfile="qr-code-test.png"
 
-    if ! command -v md5 &> /dev/null
-    then
+    if ! command -v md5 &>/dev/null; then
         cmd="md5sum"
         md5_expected="d66a1f47df6043dcf9850613521f9507  ${testfile}"
     else
@@ -60,7 +59,7 @@ test_qr_healthz() {
 
 teardown_suite() {
     printf "Stopping qr-code-service (%s)\n" "$PID"
-    if ! kill $PID > /dev/null 2>&1; then
+    if ! kill "$PID" >/dev/null 2>&1; then
         printf "Failed to send SIGTERM to %s\n" "$PID"
     fi
 }
