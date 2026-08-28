@@ -1,0 +1,29 @@
+[project]
+name = "qr_code_service"
+version = "0.1.0"
+description = "QR code encoding, as a library and as an http service"
+authors = [
+    { name = "Björn Busse", email = "bj.rn@baerlin.eu" }
+]
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.12"
+dependencies = []
+
+# The http service needs these; importing qr_code_service.encode does not
+[project.optional-dependencies]
+service = [
+    "flask>=3.0.0",
+    "prometheus-flask-exporter>=0.23.0",
+    "configargparse>=1.7"
+]
+
+[project.scripts]
+qr-service = "qr_code_service.service:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

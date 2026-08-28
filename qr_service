@@ -15,6 +15,7 @@ import pathlib
 from flask import abort, Flask, request, jsonify
 from prometheus_flask_exporter import PrometheusMetrics
 import configargparse
+from qr_code_service import encode as encode_qr, QREncodeError
 
 app = Flask(__name__)
 
@@ -48,50 +49,20 @@ def encode():
     :type margin: str
     '''
     url = request.args.get('url')
-    size = request.args.get('size')
-    margin = request.args.get('margin')
-    if not size:
-        size = "15"
-    if not margin:
-        margin = "2"
+    size = request.args.get('size') or "15"
+    margin = request.args.get('margin') or "2"
 
-    fileid = hashlib.md5(url.encode(encoding='UTF-8')).hexdigest()
-    filename = str(fileid) + '_' + size + '_' + margin + '.png'
-    path = 'static/' + filename
+    if not url:
+        abort(400, description="url is required")
 
-    if os.path.isfile(path):
-        fstat = os.stat(path)
-        if fstat.st_size > 0:
-            app.logger.info(' Serving existing file')
-            return send_file(filename)
+    try:
+        path = encode_qr(url, size=size, margin=margin,
+                         directory=app.static_folder)
+    except QREncodeError as e:
+        app.logger.error(" %s", e)
+        abort(404, description="Resource not found")
 
-    process = Popen(['qrencode',
-                     '-m',
-                     margin,
-                     '--size',
-                     size,
-                     '-o',
-                     path,
-                     url],
-                     stdout=PIPE,
-                     stderr=PIPE,
-                     start_new_session=True,
-                     close_fds=False)
-
-    output, error = process.communicate()
-    output = output.splitlines()
-    error = error.splitlines()
-    for line in output:
-        logging.info(line)
-    for line in error:
-        logging.info(line)
-
-    fstat = os.stat(path)
-    if fstat.st_size > 0:
-        return send_file(filename)
-
-    abort(404, description="Resource not found")
-    return False
+    return send_file(os.path.basename(path))
 
 @app.route("/files")
 def list_files(path="static/"):
