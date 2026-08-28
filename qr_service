@@ -9,15 +9,24 @@ bj.rn@baerlin.eu
 
 import logging
 import os
-from subprocess import Popen,PIPE
-import hashlib
-import pathlib
+import urllib.error
+import urllib.request
 from flask import abort, Flask, request, jsonify
 from prometheus_flask_exporter import PrometheusMetrics
 import configargparse
 from qr_code_service import encode as encode_qr, QREncodeError
 
 app = Flask(__name__)
+
+# First 8 bytes of any PNG file
+PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+LIVENESS_TIMEOUT = 5
+DEFAULT_SIZE = 15
+DEFAULT_MARGIN = 2
+
+# Overwritten from --listen-port at startup; the probe has to reach the port
+# we actually bound, not a hardcoded one.
+LISTEN_PORT = "44123"
 
 @app.route("/")
 def info():
@@ -49,11 +58,21 @@ def encode():
     :type margin: str
     '''
     url = request.args.get('url')
-    size = request.args.get('size') or "15"
-    margin = request.args.get('margin') or "2"
 
     if not url:
         abort(400, description="url is required")
+
+    # Query arguments arrive as strings; segno wants integers and rejects
+    # anything else outright, so coerce here and answer 400 rather than
+    # letting a bad value surface as a 404 from the encoder.
+    try:
+        size = int(request.args.get('size') or DEFAULT_SIZE)
+        margin = int(request.args.get('margin') or DEFAULT_MARGIN)
+    except (TypeError, ValueError):
+        abort(400, description="size and margin must be integers")
+
+    if size < 1 or margin < 0:
+        abort(400, description="size must be >= 1 and margin >= 0")
 
     try:
         path = encode_qr(url, size=size, margin=margin,
@@ -101,41 +120,33 @@ def remove_files(path, suffix):
             os.remove(path + item)
 
 def probe_liveness():
-    ''' Check health '''
-    # Remove test file
-    testfile = "qr-code-test.png"
-    if os.path.isfile(testfile):
-        os.remove(testfile)
+    '''
+    Round-trips a real request through our own HTTP listener and checks that
+    what comes back is a PNG. Deliberately not a checksum of the response: the
+    encoder's exact output changes with the library version, and a liveness
+    probe that fails on a dependency bump is worse than no probe at all.
+    '''
+    url = ("http://localhost:%s/encode"
+           "?url=http://github.com/bbusse/qr-service&size=15&margin=2"
+           % LISTEN_PORT)
 
-    url = "http://localhost:44123/encode?url=http://github.com/bbusse/qr-service&size=15&margin=2"
-    process = Popen(['curl',
-                     '-s',
-                     '-o',
-                     'qr-code-test.png',
-                     url],
-                     stdout=PIPE,
-                     stderr=PIPE,
-                     start_new_session=True,
-                     close_fds=False)
-
-    output, error = process.communicate()
-    output = output.splitlines()
-    error = error.splitlines()
-    for line in output:
-        logging.info(line)
-    for line in error:
-        logging.info(line)
-
-    cksum = hashlib.md5(pathlib.Path(testfile).read_bytes()).hexdigest()
-
-    # Remove test file
-    if os.path.isfile(testfile):
-        os.remove(testfile)
-
-    if cksum == "d66a1f47df6043dcf9850613521f9507":
-        return "OK"
-    else:
+    try:
+        with urllib.request.urlopen(url, timeout=LIVENESS_TIMEOUT) as response:
+            if response.status != 200:
+                logging.warning("liveness: /encode returned HTTP %s", response.status)
+                return "ERROR"
+            body = response.read()
+    except (urllib.error.URLError, OSError) as err:
+        logging.warning("liveness: /encode unreachable: %s", err)
         return "ERROR"
+
+    # The 8-byte PNG signature; anything else means we served something broken.
+    if not body.startswith(PNG_SIGNATURE):
+        logging.warning("liveness: /encode returned %d bytes that are not a PNG",
+                        len(body))
+        return "ERROR"
+
+    return "OK"
 
 def send_file(filename):
     ''' Send file to client '''
@@ -178,6 +189,7 @@ if __name__ == "__main__":
 
     listen_address = args.listen_address
     listen_port = args.listen_port
+    LISTEN_PORT = listen_port
     disable_delete = args.disable_delete
     disable_list = args.disable_list
     debug = args.debug
