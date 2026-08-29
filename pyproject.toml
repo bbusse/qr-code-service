@@ -10,6 +10,7 @@ license = { file = "LICENSE" }
 requires-python = ">=3.12"
 dependencies = [
     "segno>=1.6.1",
+    "Pillow>=10.0.0",
 ]
 
 # The http service needs these; importing qr_code_service.encode does not
