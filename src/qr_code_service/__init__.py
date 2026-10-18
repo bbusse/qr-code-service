@@ -5,6 +5,7 @@ QR code encoding
 bj.rn@baerlin.eu
 '''
 
-from qr_code_service.encoder import encode, encode_to_dir, QREncodeError
+from qr_code_service.encoder import (encode, encode_png, encode_to_dir,
+                                     QREncodeError)
 
-__all__ = ["encode", "encode_to_dir", "QREncodeError"]
+__all__ = ["encode", "encode_png", "encode_to_dir", "QREncodeError"]

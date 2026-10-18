@@ -6,6 +6,7 @@ bj.rn@baerlin.eu
 '''
 
 import hashlib
+import io
 import logging
 import os
 import tempfile
@@ -102,6 +103,42 @@ def colour_key(value):
     return str(value).lstrip("#") if value else "d"
 
 
+def encode_png(url, size=DEFAULT_SIZE, margin=DEFAULT_MARGIN, target_px=None,
+               dark=None, light=None):
+    '''
+    The png bytes of a qr-code for url. Where the bytes are kept is the
+    caller's business, so a store of any kind can sit behind this.
+
+    scale is the pixels per module, border the quiet zone in modules, which
+    is what qrencode called size and margin. target_px overrides size with the
+    scale that fits, then pads the symbol to that square.
+    '''
+    if not url:
+        raise QREncodeError("no url to encode")
+
+    qr = segno.make(url, error="m")
+    if target_px:
+        size = scale_for(qr, target_px, margin)
+
+    out = io.BytesIO()
+    try:
+        qr.save(out, kind="png", scale=size, border=margin,
+                dark=dark or "#000", light=light or "#fff")
+        if target_px:
+            out.seek(0)
+            padded = pad_to(out, target_px, light)
+            out = io.BytesIO()
+            padded.save(out, format="PNG")
+    except (OSError, ValueError) as e:
+        raise QREncodeError(f"could not encode {url!r}: {e}") from e
+
+    data = out.getvalue()
+    if not data:
+        raise QREncodeError("encoding produced no data")
+
+    return data
+
+
 def encode_to_dir(url, directory, size=DEFAULT_SIZE, margin=DEFAULT_MARGIN,
                   target_px=None, dark=None, light=None):
     '''
@@ -122,33 +159,20 @@ def encode_to_dir(url, directory, size=DEFAULT_SIZE, margin=DEFAULT_MARGIN,
         logging.debug("qr: serving existing %s", path)
         return path
 
-    qr = segno.make(url, error="m")
-    if target_px:
-        size = scale_for(qr, target_px, margin)
+    data = encode_png(url, size, margin, target_px, dark, light)
 
     # Written to a temporary name first and moved into place, so a reader
     # never sees a half-written png and a failed run leaves nothing behind
-    fd, tmp = tempfile.mkstemp(dir=directory, suffix=".png")
-    os.close(fd)
+    fd, tmp = tempfile.mkstemp(dir=directory, suffix=".part")
     try:
-        # scale is the pixels per module, border the quiet zone in modules,
-        # which is what qrencode called size and margin
-        qr.save(tmp, kind="png", scale=size, border=margin,
-                dark=dark or "#000", light=light or "#fff")
-        if os.path.getsize(tmp) == 0:
-            raise QREncodeError("encoding produced an empty file")
-        if target_px:
-            pad_to(tmp, target_px, light).save(tmp, format="PNG")
+        with os.fdopen(fd, "wb") as f:
+            f.write(data)
         os.replace(tmp, path)
-        prune(directory)
-    except QREncodeError:
+    except OSError as e:
         if os.path.exists(tmp):
             os.remove(tmp)
-        raise
-    except (OSError, ValueError) as e:
-        if os.path.exists(tmp):
-            os.remove(tmp)
-        raise QREncodeError(f"could not encode {url!r}: {e}") from e
+        raise QREncodeError(f"could not write {path}: {e}") from e
+    prune(directory)
 
     return path
 
